@@ -1,0 +1,28 @@
+Headscale Data and Private Keys
+
+data/
+config/private.key
+config/noise_private.key
+config/db.sqlite
+config/db.sqlite-wal
+config/db.sqlite-shm
+
+Headplane Data and Configuration (contains cookie secrets)
+
+headplane-data/
+headplane-config/config.yaml
+
+Caddy SSL Certificates and Auto-Saves
+
+caddy_data/
+caddy_config/
+
+Python Notifier Data
+
+notifier-data/
+pycache/
+
+OS Generated Files
+
+.DS_Store
+Thumbs.db

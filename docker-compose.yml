@@ -1,0 +1,44 @@
+services:
+  headscale:
+    image: headscale/headscale:0.29.2
+    container_name: headscale
+    restart: unless-stopped
+    command: serve
+    labels:
+      - "me.tale.headplane.target=headscale"
+    volumes:
+      - ./config:/etc/headscale
+      - ./data:/var/lib/headscale
+
+  headplane:
+    image: ghcr.io/tale/headplane:latest
+    container_name: headplane
+    restart: unless-stopped
+    volumes:
+      - ./headplane-config/config.yaml:/etc/headplane/config.yaml
+      - ./headplane-data:/var/lib/headplane
+      - ./config:/etc/headscale
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  notifier:
+    image: python:3.11-alpine
+    container_name: headscale_notifier
+    restart: unless-stopped
+    volumes:
+      - ./notifier.py:/app/notifier.py
+      - ./notifier-data:/data
+    environment:
+      - DISCORD_WEBHOOK=YOUR_WEBHOOK_URL
+    command: python /app/notifier.py
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy_data:/data
+      - ./caddy_config:/config
