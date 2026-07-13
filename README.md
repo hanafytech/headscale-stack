@@ -100,11 +100,38 @@ docker exec headscale headscale users create myuser
      curl -fsSL https://tailscale.com/install.sh | sh
      ```
    * **For Windows/macOS/Mobile:** Download the app from the [Tailscale website](https://tailscale.com/download).
+
 6. Once installed, connect the device to your custom VPN by running the following in your client's terminal:
+
 ```bash
 tailscale up --login-server https://headscale.yourdomain.com
 ```
 7. The terminal will output a machine key/registration link. Copy it, go to the Headplane UI, click **Add Device -> Register Machine Key**, paste the key, and select your user to authenticate the device!
+
+### Optional: Use a reusable pre-authentication key (recommended for multiple devices)
+
+If you plan on registering multiple devices, you can generate a reusable pre-authentication key on your Headscale server instead of completing the browser-based login for each device.
+
+Generate a reusable pre-authentication key:
+
+```bash
+docker exec headscale headscale preauthkeys create --user 1 --reusable --expiration 24h
+```
+
+> **Note:** Replace `1` with the ID of the Headscale user you want to register the device under.
+
+The command will return an auth key similar to:
+
+```text
+hskey-auth-1234567890
+```
+
+You can then register devices directly by running:
+
+```bash
+tailscale up --login-server https://headscale.yourdomain.com --authkey hskey-auth-1234567890
+```
+
 
 
 ## 💻 Tech Stack
