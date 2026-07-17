@@ -53,7 +53,7 @@ mkdir -p config data headplane-data headplane-config caddy_data caddy_config not
 wget -O config/config.yaml https://raw.githubusercontent.com/juanfont/headscale/main/config-example.yaml
 ```
 
-  *Edit `config/config.yaml` and set `server_url: https://headscale.yourdomain.com`.*
+  *Edit config/config.yaml. You must set server_url: https://headscale.yourdomain.com AND change listen_addr: 0.0.0.0:8080 (otherwise Caddy cannot route traffic to the container).*
 
 3. Create `headplane-config/config.yaml` and populate it with your settings:
    *(Note: The `public_url` variable is crucial! It ensures the "Register Machine Key" UI displays your actual domain instead of internal Docker IPs).*
