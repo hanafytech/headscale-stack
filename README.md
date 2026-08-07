@@ -53,9 +53,37 @@ mkdir -p config data headplane-data headplane-config caddy_data caddy_config not
 wget -O config/config.yaml https://raw.githubusercontent.com/juanfont/headscale/main/config-example.yaml
 ```
 
-  *Edit config/config.yaml. You must set server_url: https://headscale.yourdomain.com AND change listen_addr: 0.0.0.0:8080 (otherwise Caddy cannot route traffic to the container).*
+&emsp;&ensp; ***Edit `config/config.yaml` and set `server_url: https://headscale.yourdomain.com`.*
+*Change the listen address to `listen_addr: 0.0.0.0:8080` (otherwise Caddy cannot route traffic to the container)!***
 
-3. Create `headplane-config/config.yaml` and populate it with your settings:
+3. Configure the Built-in DERP Server (Firewall Bypass)
+In `config/config.yaml`, scroll to the `derp:` section. You must make three critical changes to bypass restrictive firewalls and prevent connection failures:
+* Set `enabled: true` to turn on the embedded server.
+* Comment out the `ipv4` and `ipv6` fields. **(Important: You must comment out or remove the default `198.51.100.1` and `2001:db8::1` dummy IPs, or your clients will attempt to route traffic to fake addresses and fail).**
+* Empty the official relay list by setting `urls: []` and commenting out the default Tailscale URL.
+
+Modify the block to match this:
+```yaml
+derp:
+  server:
+    enabled: true
+    region_id: 999
+    region_code: "headscale"
+    region_name: "Headscale Embedded DERP"
+    verify_clients: true
+    stun_listen_addr: "0.0.0.0:3478"
+    private_key_path: /var/lib/headscale/derp_server_private.key
+    automatically_add_embedded_derp_region: true
+    # ipv4: 198.51.100.1
+    # ipv6: 2001:db8::1
+  urls: []
+  #  - [https://controlplane.tailscale.com/derpmap/default](https://controlplane.tailscale.com/derpmap/default)
+  paths: []
+  auto_update_enabled: true
+  update_frequency: 3h
+```
+
+4. Create `headplane-config/config.yaml` and populate it with your settings:
    *(Note: The `public_url` variable is crucial! It ensures the "Register Machine Key" UI displays your actual domain instead of internal Docker IPs).*
 
 
@@ -71,11 +99,11 @@ headscale:
   config_path: "/etc/headscale/config.yaml"
 ```
 
-4. Update External Variables:
+5. Update External Variables:
    * **Caddyfile:** Open the `Caddyfile` and ensure your domain is correct.
    * **Discord Notifier (Optional):** Open `docker-compose.yaml` and replace `your_webhook_url_here` under the `notifier` service with your actual Discord Webhook URL.
 
-5. Deploy the stack:
+6. Deploy the stack:
 
 ```bash
 docker compose pull
